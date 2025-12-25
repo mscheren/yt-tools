@@ -60,6 +60,7 @@ streamlit run src/ytdl_app/gui/app.py
 ```
 
 The GUI provides:
+
 - URL input for videos or playlists
 - Format selection (MP4/MP3)
 - Output directory configuration
@@ -68,7 +69,7 @@ The GUI provides:
 
 ## Project Structure
 
-```
+```plaintext
 video_edit/
 ├── src/
 │   └── ytdl_app/
