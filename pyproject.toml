@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "ytdl-app"
+version = "0.1.0"
+description = "YouTube downloader with CLI and Streamlit GUI support."
+authors = ["Marcel Scherenberg <marcel.scherenberg@t-online.de>"]
+readme = "README.md"
+packages = [{ include = "ytdl_app", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+yt-dlp = "^2025.6.30"
+click = "^8.1"
+streamlit = "^1.40"
+
+[tool.poetry.scripts]
+ytdl = "ytdl_app.cli.main:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
