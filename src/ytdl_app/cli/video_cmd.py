@@ -4,7 +4,12 @@ from pathlib import Path
 
 import click
 
-from ytdl_app.video import TextOverlayConfig, VideoEditor, concatenate_videos, get_video_info
+from ytdl_app.video import (
+    TextOverlayConfig,
+    VideoEditor,
+    concatenate_videos,
+    get_video_info,
+)
 
 
 @click.command()
@@ -27,7 +32,9 @@ def trim(input_file: Path, output_file: Path, start: float, end: float):
 @click.command()
 @click.argument("output_file", type=click.Path(path_type=Path))
 @click.argument("input_files", nargs=-1, type=click.Path(exists=True, path_type=Path))
-@click.option("--transition", is_flag=True, help="Use compose transition between clips.")
+@click.option(
+    "--transition", is_flag=True, help="Use compose transition between clips."
+)
 def concat(output_file: Path, input_files: tuple[Path, ...], transition: bool):
     """Concatenate multiple videos into one."""
     if len(input_files) < 2:

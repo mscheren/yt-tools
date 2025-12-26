@@ -4,12 +4,14 @@ from pathlib import Path
 
 import streamlit as st
 
-from ytdl_app.download import DownloadOptions, Downloader
+from ytdl_app.download import Downloader, DownloadOptions
 from ytdl_app.gui.components import render_directory_selector
 from ytdl_app.models import OutputFormat
 
 
-def _perform_download(url: str, is_playlist: bool, options: DownloadOptions) -> tuple[bool, str]:
+def _perform_download(
+    url: str, is_playlist: bool, options: DownloadOptions
+) -> tuple[bool, str]:
     """Execute download and return (success, message)."""
     try:
         downloader = Downloader(options=options)

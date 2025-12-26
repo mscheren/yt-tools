@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from ytdl_app.download import DownloadOptions, Downloader
+from ytdl_app.download import Downloader, DownloadOptions
 from ytdl_app.models import OutputFormat
 
 
@@ -25,19 +25,23 @@ def _create_progress_callback() -> callable:
 @click.command()
 @click.argument("url")
 @click.option(
-    "-o", "--output-dir",
+    "-o",
+    "--output-dir",
     type=click.Path(path_type=Path),
     default=Path.cwd(),
     help="Output directory for downloaded files.",
 )
 @click.option(
-    "-f", "--format", "output_format",
+    "-f",
+    "--format",
+    "output_format",
     type=click.Choice(["mp4", "mp3"], case_sensitive=False),
     default="mp4",
     help="Output format: mp4 for video, mp3 for audio only.",
 )
 @click.option(
-    "-c", "--cookies",
+    "-c",
+    "--cookies",
     type=click.Path(exists=True, path_type=Path),
     default=None,
     help="Path to cookies.txt file for authenticated downloads.",
@@ -50,7 +54,9 @@ def video(url: str, output_dir: Path, output_format: str, cookies: Path | None):
         cookies_file=cookies,
     )
 
-    downloader = Downloader(options=options, progress_callback=_create_progress_callback())
+    downloader = Downloader(
+        options=options, progress_callback=_create_progress_callback()
+    )
     click.echo(f"Downloading video as {output_format.upper()}...")
 
     try:
@@ -63,19 +69,23 @@ def video(url: str, output_dir: Path, output_format: str, cookies: Path | None):
 @click.command()
 @click.argument("url")
 @click.option(
-    "-o", "--output-dir",
+    "-o",
+    "--output-dir",
     type=click.Path(path_type=Path),
     default=Path.cwd(),
     help="Output directory for downloaded files.",
 )
 @click.option(
-    "-f", "--format", "output_format",
+    "-f",
+    "--format",
+    "output_format",
     type=click.Choice(["mp4", "mp3"], case_sensitive=False),
     default="mp4",
     help="Output format: mp4 for video, mp3 for audio only.",
 )
 @click.option(
-    "-c", "--cookies",
+    "-c",
+    "--cookies",
     type=click.Path(exists=True, path_type=Path),
     default=None,
     help="Path to cookies.txt file for authenticated downloads.",
@@ -88,13 +98,17 @@ def playlist(url: str, output_dir: Path, output_format: str, cookies: Path | Non
         cookies_file=cookies,
     )
 
-    downloader = Downloader(options=options, progress_callback=_create_progress_callback())
+    downloader = Downloader(
+        options=options, progress_callback=_create_progress_callback()
+    )
     click.echo(f"Downloading playlist as {output_format.upper()}...")
 
     try:
         info = downloader.download_playlist(url)
         entries = info.get("entries", [])
-        click.echo(f"Successfully downloaded: {info.get('title', 'Unknown')} ({len(entries)} items)")
+        click.echo(
+            f"Successfully downloaded: {info.get('title', 'Unknown')} ({len(entries)} items)"
+        )
     except Exception as e:
         raise click.ClickException(f"Download failed: {e}") from e
 

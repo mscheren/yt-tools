@@ -28,7 +28,11 @@ def trim_audio(input_file: Path, output_file: Path, start: float, end: float):
 @click.command()
 @click.argument("input_file", type=click.Path(exists=True, path_type=Path))
 @click.argument("output_file", type=click.Path(path_type=Path))
-@click.option("--preset", type=click.Choice([p.value for p in EffectPreset]), help="Apply a preset.")
+@click.option(
+    "--preset",
+    type=click.Choice([p.value for p in EffectPreset]),
+    help="Apply a preset.",
+)
 @click.option("--gain", type=float, help="Gain adjustment in dB.")
 @click.option("--highpass", type=float, help="Highpass filter cutoff in Hz.")
 @click.option("--lowpass", type=float, help="Lowpass filter cutoff in Hz.")

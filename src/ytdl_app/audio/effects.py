@@ -1,6 +1,6 @@
 """Audio effect configurations and presets."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
@@ -100,7 +100,10 @@ class EffectChain:
                 highpass_hz=300, lowpass_hz=5000, compressor=True, limiter=True
             ),
             EffectPreset.PODCAST: cls(
-                highpass_hz=80, compressor=True, compressor_threshold_db=-18, limiter=True
+                highpass_hz=80,
+                compressor=True,
+                compressor_threshold_db=-18,
+                limiter=True,
             ),
             EffectPreset.REVERB_LIGHT: cls(
                 reverb=True, reverb_room_size=0.3, reverb_wet_level=0.15
@@ -108,8 +111,6 @@ class EffectChain:
             EffectPreset.REVERB_HEAVY: cls(
                 reverb=True, reverb_room_size=0.9, reverb_wet_level=0.6
             ),
-            EffectPreset.WARM: cls(
-                lowpass_hz=8000, gain_db=2, compressor=True
-            ),
+            EffectPreset.WARM: cls(lowpass_hz=8000, gain_db=2, compressor=True),
         }
         return presets[preset]

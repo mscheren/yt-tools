@@ -22,17 +22,25 @@ def _render_trim_section(source_dir: Path):
     if selected_file:
         try:
             meta = get_video_info(selected_file)
-            st.info(f"Duration: {meta.format_duration()} | Resolution: {meta.width}x{meta.height}")
+            st.info(
+                f"Duration: {meta.format_duration()} | Resolution: {meta.width}x{meta.height}"
+            )
         except Exception:
             pass
 
         col1, col2 = st.columns(2)
         with col1:
-            start_time = st.number_input("Start time (seconds)", min_value=0.0, key="trim_start")
+            start_time = st.number_input(
+                "Start time (seconds)", min_value=0.0, key="trim_start"
+            )
         with col2:
-            end_time = st.number_input("End time (seconds)", min_value=0.0, key="trim_end")
+            end_time = st.number_input(
+                "End time (seconds)", min_value=0.0, key="trim_end"
+            )
 
-        output_name = st.text_input("Output filename", value="trimmed_video.mp4", key="trim_output")
+        output_name = st.text_input(
+            "Output filename", value="trimmed_video.mp4", key="trim_output"
+        )
 
         if st.button("Trim Video", key="trim_btn", disabled=end_time <= start_time):
             output_path = source_dir / output_name

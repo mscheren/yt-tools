@@ -23,7 +23,9 @@ def _render_effects_section(source_dir: Path):
     if selected_file:
         try:
             meta = get_audio_info(selected_file)
-            st.info(f"Duration: {meta.format_duration()} | {meta.sample_rate}Hz | {meta.channels}ch")
+            st.info(
+                f"Duration: {meta.format_duration()} | {meta.sample_rate}Hz | {meta.channels}ch"
+            )
         except Exception:
             pass
 
@@ -45,7 +47,9 @@ def _render_effects_section(source_dir: Path):
             with col1:
                 gain_db = st.slider("Gain (dB)", -20.0, 20.0, 0.0, key="gain_slider")
                 highpass = st.slider("Highpass (Hz)", 0, 500, 0, key="highpass_slider")
-                lowpass = st.slider("Lowpass (Hz)", 1000, 20000, 20000, key="lowpass_slider")
+                lowpass = st.slider(
+                    "Lowpass (Hz)", 1000, 20000, 20000, key="lowpass_slider"
+                )
 
             with col2:
                 use_compressor = st.checkbox("Compressor", key="use_compressor")
@@ -62,7 +66,9 @@ def _render_effects_section(source_dir: Path):
             )
 
         normalize = st.checkbox("Normalize output", value=True, key="normalize_output")
-        output_name = st.text_input("Output filename", value="processed_audio.wav", key="fx_output")
+        output_name = st.text_input(
+            "Output filename", value="processed_audio.wav", key="fx_output"
+        )
 
         if st.button("Apply Effects", key="apply_effects_btn"):
             output_path = source_dir / output_name
@@ -98,13 +104,21 @@ def _render_trim_section(source_dir: Path):
 
         col1, col2 = st.columns(2)
         with col1:
-            start_time = st.number_input("Start time (seconds)", min_value=0.0, key="audio_trim_start")
+            start_time = st.number_input(
+                "Start time (seconds)", min_value=0.0, key="audio_trim_start"
+            )
         with col2:
-            end_time = st.number_input("End time (seconds)", min_value=0.0, key="audio_trim_end")
+            end_time = st.number_input(
+                "End time (seconds)", min_value=0.0, key="audio_trim_end"
+            )
 
-        output_name = st.text_input("Output filename", value="trimmed_audio.wav", key="audio_trim_output")
+        output_name = st.text_input(
+            "Output filename", value="trimmed_audio.wav", key="audio_trim_output"
+        )
 
-        if st.button("Trim Audio", key="audio_trim_btn", disabled=end_time <= start_time):
+        if st.button(
+            "Trim Audio", key="audio_trim_btn", disabled=end_time <= start_time
+        ):
             output_path = source_dir / output_name
             try:
                 with st.spinner("Trimming audio..."):

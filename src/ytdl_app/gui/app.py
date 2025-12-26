@@ -19,7 +19,9 @@ def main():
     st.title("Media Tools")
     st.caption("Download, edit video, and process audio")
 
-    tab_download, tab_video, tab_audio = st.tabs(["Download", "Video Editing", "Audio Editing"])
+    tab_download, tab_video, tab_audio = st.tabs(
+        ["Download", "Video Editing", "Audio Editing"]
+    )
 
     with tab_download:
         render_download_tab()
