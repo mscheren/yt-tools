@@ -2,7 +2,7 @@
 name = "ytdl-app"
 version = "0.1.0"
 description = "YouTube downloader with CLI and Streamlit GUI support."
-authors = ["Marcel Scherenberg <marcel.scherenberg@t-online.de>"]
+authors = ["mscheren"]
 readme = "README.md"
 packages = [{ include = "ytdl_app", from = "src" }]
 
@@ -11,6 +11,9 @@ python = "^3.12"
 yt-dlp = "^2025.6.30"
 click = "^8.1"
 streamlit = "^1.40"
+moviepy = "^2.0"
+pedalboard = "^0.9"
+numpy = "^2.0"
 
 [tool.poetry.scripts]
 ytdl = "ytdl_app.cli.main:cli"

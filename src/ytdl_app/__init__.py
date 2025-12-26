@@ -1,3 +1,3 @@
-"""YouTube downloader application with CLI and GUI interfaces."""
+"""YouTube downloader and media editing application."""
 
 __version__ = "0.1.0"

@@ -1,25 +1,19 @@
-"""Core downloader functionality using yt-dlp."""
+"""YouTube content downloader using yt-dlp."""
 
 from dataclasses import dataclass, field
-from enum import Enum
 from pathlib import Path
 from typing import Callable
 
 import yt_dlp
 
-
-class OutputFormat(Enum):
-    """Supported output formats."""
-
-    MP4 = "mp4"
-    MP3 = "mp3"
+from ytdl_app.models import OutputFormat
 
 
 @dataclass
 class DownloadOptions:
     """Configuration options for downloads."""
 
-    output_dir: Path = field(default_factory=lambda: Path.cwd())
+    output_dir: Path = field(default_factory=Path.cwd)
     output_format: OutputFormat = OutputFormat.MP4
     cookies_file: Path | None = None
 
@@ -34,7 +28,6 @@ class DownloadOptions:
 class Downloader:
     """YouTube content downloader using yt-dlp."""
 
-    # Format strings for yt-dlp
     _VIDEO_FORMAT = "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b"
     _AUDIO_FORMAT = "ba[ext=m4a]/ba/b"
 
@@ -43,13 +36,6 @@ class Downloader:
         options: DownloadOptions | None = None,
         progress_callback: Callable[[dict], None] | None = None,
     ):
-        """
-        Initialize the downloader.
-
-        Args:
-            options: Download configuration options.
-            progress_callback: Optional callback for progress updates.
-        """
         self.options = options or DownloadOptions()
         self.progress_callback = progress_callback
 
@@ -84,18 +70,7 @@ class Downloader:
         return opts
 
     def download(self, url: str) -> dict:
-        """
-        Download a single video or audio from URL.
-
-        Args:
-            url: YouTube video URL.
-
-        Returns:
-            Dictionary with download info from yt-dlp.
-
-        Raises:
-            yt_dlp.DownloadError: If download fails.
-        """
+        """Download a single video or audio from URL."""
         opts = self._build_ydl_opts(is_playlist=False)
         opts["noplaylist"] = True
 
@@ -103,33 +78,14 @@ class Downloader:
             return ydl.extract_info(url, download=True)
 
     def download_playlist(self, url: str) -> dict:
-        """
-        Download an entire playlist.
-
-        Args:
-            url: YouTube playlist URL.
-
-        Returns:
-            Dictionary with playlist info from yt-dlp.
-
-        Raises:
-            yt_dlp.DownloadError: If download fails.
-        """
+        """Download an entire playlist."""
         opts = self._build_ydl_opts(is_playlist=True)
 
         with yt_dlp.YoutubeDL(opts) as ydl:
             return ydl.extract_info(url, download=True)
 
     def get_info(self, url: str) -> dict:
-        """
-        Fetch metadata without downloading.
-
-        Args:
-            url: YouTube video or playlist URL.
-
-        Returns:
-            Dictionary with video/playlist metadata.
-        """
+        """Fetch metadata without downloading."""
         opts = {
             "quiet": True,
             "no_warnings": True,

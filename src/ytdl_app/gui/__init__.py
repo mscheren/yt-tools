@@ -1,1 +1,5 @@
-"""Streamlit GUI for the downloader."""
+"""Streamlit GUI for the application."""
+
+from .app import main
+
+__all__ = ["main"]
