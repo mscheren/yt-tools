@@ -4,9 +4,30 @@ A Python application for downloading YouTube content and editing video/audio fil
 
 ## Features
 
+### Download
 - Download YouTube videos and playlists (MP4/MP3)
-- Video editing: trim, concatenate, add text overlays
-- Audio processing: effects, EQ, compression, reverb, normalization
+- Resolution selection (1080p, 720p, 480p, etc.)
+- Download queue with pause/resume
+- Archive tracking to avoid re-downloads
+
+### Video Editing
+- Trim, concatenate, speed adjustment, reverse, loop
+- Crop, resize, rotate
+- Color grading (brightness, contrast, saturation, gamma)
+- Filters (grayscale, sepia, blur)
+- Text overlays and subtitles
+
+### Audio Processing
+- Effects: EQ, compression, reverb, gain, limiting
+- Presets: podcast, radio, reverb_light, reverb_heavy, warm
+- Mixing: overlay, ducking, crossfade, fades
+- Noise removal (gate and spectral methods)
+- Extract audio from video
+
+### Project Management
+- Save/load projects (JSON/YAML)
+- Batch processing
+- Undo/redo history
 
 ## Requirements
 
@@ -76,41 +97,74 @@ ytdl audio-info input.mp3
 
 Available effect presets: `radio`, `podcast`, `reverb_light`, `reverb_heavy`, `warm`
 
+#### Project Commands
+
+```bash
+# Create new project
+ytdl project-new "My Project" --output project.json
+
+# Show project info
+ytdl project-info project.json
+
+# List projects in directory
+ytdl project-list ./projects
+```
+
 ### GUI
 
 Launch the Streamlit web interface:
 
 ```bash
-streamlit run src/ytdl_app/gui/app.py
+cd src && streamlit run ytdl_app/gui/app.py
 ```
 
-The GUI provides three tabs:
+Or with poetry:
 
-1. **Download**: YouTube video/playlist downloads with directory browser
-2. **Video Editing**: Trim videos, add text overlays, view metadata
-3. **Audio Editing**: Apply effects (presets or custom), trim, normalize
+```bash
+poetry run sh -c "cd src && streamlit run ytdl_app/gui/app.py"
+```
+
+The GUI provides four main tabs:
+
+1. **Download**: YouTube video/playlist downloads with resolution selection, directory browser
+2. **Video Editing**: Trim, transforms (speed/crop/resize/rotate), effects (color grading/filters), text overlays
+3. **Audio Editing**: Effects with presets, mixing (overlay/ducking/crossfade), processing (noise removal/normalize)
+4. **Projects**: Create, load, and manage editing projects
 
 ## Project Structure
 
 ```plaintext
 src/ytdl_app/
 ├── models/             # Shared data models
-│   ├── formats.py      # Output format enums
+│   ├── formats.py      # Output format, resolution, codec enums
 │   └── metadata.py     # Video/audio metadata classes
 ├── download/           # YouTube downloading
-│   └── downloader.py   # Downloader class
+│   ├── config.py       # Download configuration
+│   ├── downloader.py   # Downloader with retry logic
+│   ├── queue.py        # Download queue management
+│   └── archive.py      # Track downloaded videos
 ├── video/              # Video editing
 │   ├── editor.py       # VideoEditor class
-│   ├── operations.py   # Concatenate, get info
-│   └── overlay.py      # Text overlay config
+│   ├── transforms.py   # Speed, crop, resize, rotate
+│   ├── effects.py      # Color grading, filters
+│   ├── subtitles.py    # Subtitle support
+│   └── operations.py   # Concatenate, get info
 ├── audio/              # Audio processing
 │   ├── editor.py       # AudioEditor class
-│   └── effects.py      # Effect chain and presets
+│   ├── effects.py      # Effect chain and presets
+│   ├── mixing.py       # Overlay, ducking, crossfade
+│   └── processing.py   # Noise removal, extraction
+├── project/            # Project management
+│   ├── config.py       # Project configuration
+│   ├── manager.py      # Save/load projects
+│   ├── history.py      # Undo/redo
+│   └── batch.py        # Batch processing
 ├── cli/                # Command-line interface
 │   ├── main.py         # Entry point
 │   ├── download_cmd.py # Download commands
 │   ├── video_cmd.py    # Video commands
-│   └── audio_cmd.py    # Audio commands
+│   ├── audio_cmd.py    # Audio commands
+│   └── project_cmd.py  # Project commands
 └── gui/                # Streamlit GUI
     ├── app.py          # Main entry
     ├── state.py        # Session state
