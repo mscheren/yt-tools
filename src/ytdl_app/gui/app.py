@@ -2,8 +2,13 @@
 
 import streamlit as st
 
-from .state import init_session_state
-from .tabs import render_audio_tab, render_download_tab, render_video_tab
+from ytdl_app.gui.state import init_session_state
+from ytdl_app.gui.tabs import (
+    render_audio_tab,
+    render_download_tab,
+    render_project_tab,
+    render_video_tab,
+)
 
 
 def main():
@@ -19,8 +24,8 @@ def main():
     st.title("Media Tools")
     st.caption("Download, edit video, and process audio")
 
-    tab_download, tab_video, tab_audio = st.tabs(
-        ["Download", "Video Editing", "Audio Editing"]
+    tab_download, tab_video, tab_audio, tab_project = st.tabs(
+        ["Download", "Video Editing", "Audio Editing", "Projects"]
     )
 
     with tab_download:
@@ -31,6 +36,9 @@ def main():
 
     with tab_audio:
         render_audio_tab()
+
+    with tab_project:
+        render_project_tab()
 
 
 if __name__ == "__main__":

@@ -24,46 +24,61 @@ def render_directory_selector(
         Selected directory path.
     """
     default = default or Path.cwd()
+    input_key = f"{key}_input"
+
+    # Initialize session state before widget creation
+    if input_key not in st.session_state:
+        st.session_state[input_key] = str(default)
+
+    # Handle pending navigation (set by callbacks)
+    pending_key = f"{key}_pending_path"
+    if pending_key in st.session_state:
+        st.session_state[input_key] = st.session_state[pending_key]
+        del st.session_state[pending_key]
 
     col1, col2 = st.columns([4, 1])
 
     with col1:
         path_str = st.text_input(
             label,
-            value=str(default),
-            key=f"{key}_input",
+            key=input_key,
             help=help_text,
         )
 
     current_path = Path(path_str)
 
+    def go_home():
+        st.session_state[pending_key] = str(Path.home())
+
+    def go_parent():
+        st.session_state[pending_key] = str(Path(path_str).parent)
+
     with col2:
         st.write("")  # Spacing
-        if st.button("Home", key=f"{key}_home", use_container_width=True):
-            current_path = Path.home()
-            st.session_state[f"{key}_input"] = str(current_path)
-            st.rerun()
+        st.button("Home", key=f"{key}_home", use_container_width=True, on_click=go_home)
 
     if current_path.exists() and current_path.is_dir():
         subdirs = sorted([d for d in current_path.iterdir() if d.is_dir()])
         if subdirs:
             options = ["(current directory)"] + [d.name for d in subdirs[:20]]
-            selected = st.selectbox(
+
+            def on_nav_change():
+                selected = st.session_state[f"{key}_nav"]
+                if selected != "(current directory)":
+                    new_path = current_path / selected
+                    st.session_state[pending_key] = str(new_path)
+
+            st.selectbox(
                 "Quick navigate",
                 options,
                 key=f"{key}_nav",
                 label_visibility="collapsed",
+                on_change=on_nav_change,
             )
-            if selected != "(current directory)":
-                new_path = current_path / selected
-                st.session_state[f"{key}_input"] = str(new_path)
-                st.rerun()
 
         # Show parent navigation
         if current_path != current_path.parent:
-            if st.button("Go to parent directory", key=f"{key}_parent"):
-                st.session_state[f"{key}_input"] = str(current_path.parent)
-                st.rerun()
+            st.button("Go to parent directory", key=f"{key}_parent", on_click=go_parent)
 
         return current_path
 
