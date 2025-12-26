@@ -7,6 +7,9 @@ import streamlit as st
 from ytdl_app.gui.components import render_directory_selector, render_file_selector
 from ytdl_app.video import TextOverlayConfig, VideoEditor, get_video_info
 
+from .video_effects_tab import render_video_effects
+from .video_transforms_tab import render_video_transforms
+
 
 def _render_trim_section(source_dir: Path):
     """Render the video trimming section."""
@@ -143,13 +146,21 @@ def render_video_tab():
 
     st.divider()
 
-    tab1, tab2, tab3 = st.tabs(["Trim", "Text Overlay", "Info"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        ["Basic", "Transforms", "Effects", "Text Overlay", "Info"]
+    )
 
     with tab1:
         _render_trim_section(source_dir)
 
     with tab2:
-        _render_overlay_section(source_dir)
+        render_video_transforms(source_dir)
 
     with tab3:
+        render_video_effects(source_dir)
+
+    with tab4:
+        _render_overlay_section(source_dir)
+
+    with tab5:
         _render_info_section(source_dir)

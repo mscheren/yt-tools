@@ -8,6 +8,9 @@ from ytdl_app.audio import AudioEditor, EffectChain, EffectPreset
 from ytdl_app.audio.editor import get_audio_info
 from ytdl_app.gui.components import render_directory_selector, render_file_selector
 
+from .audio_mixing_tab import render_audio_mixing
+from .audio_processing_tab import render_audio_processing
+
 
 def _render_effects_section(source_dir: Path):
     """Render the audio effects section."""
@@ -166,13 +169,21 @@ def render_audio_tab():
 
     st.divider()
 
-    tab1, tab2, tab3 = st.tabs(["Effects", "Trim", "Info"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        ["Effects", "Mixing", "Processing", "Trim", "Info"]
+    )
 
     with tab1:
         _render_effects_section(source_dir)
 
     with tab2:
-        _render_trim_section(source_dir)
+        render_audio_mixing(source_dir)
 
     with tab3:
+        render_audio_processing(source_dir)
+
+    with tab4:
+        _render_trim_section(source_dir)
+
+    with tab5:
         _render_info_section(source_dir)

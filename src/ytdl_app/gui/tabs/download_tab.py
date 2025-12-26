@@ -4,17 +4,17 @@ from pathlib import Path
 
 import streamlit as st
 
-from ytdl_app.download import Downloader, DownloadOptions
+from ytdl_app.download import DownloadConfig, Downloader
 from ytdl_app.gui.components import render_directory_selector
-from ytdl_app.models import OutputFormat
+from ytdl_app.models import OutputFormat, VideoResolution
 
 
 def _perform_download(
-    url: str, is_playlist: bool, options: DownloadOptions
+    url: str, is_playlist: bool, config: DownloadConfig
 ) -> tuple[bool, str]:
     """Execute download and return (success, message)."""
     try:
-        downloader = Downloader(options=options)
+        downloader = Downloader(config=config)
 
         if is_playlist:
             info = downloader.download_playlist(url)
@@ -87,12 +87,43 @@ def render_download_tab():
         output_format = OutputFormat.MP4 if "MP4" in format_choice else OutputFormat.MP3
 
     with col2:
-        cookies_file = st.file_uploader(
-            "Cookies file (optional)",
-            type=["txt"],
-            key="cookies_upload",
-            help="Upload cookies.txt for authenticated downloads",
-        )
+        if output_format == OutputFormat.MP4:
+            resolution_choice = st.selectbox(
+                "Resolution",
+                ["Best Available", "1080p", "720p", "480p", "360p"],
+                key="download_resolution",
+            )
+            resolution_map = {
+                "Best Available": VideoResolution.BEST,
+                "1080p": VideoResolution.R_1080P,
+                "720p": VideoResolution.R_720P,
+                "480p": VideoResolution.R_480P,
+                "360p": VideoResolution.R_360P,
+            }
+            resolution = resolution_map[resolution_choice]
+        else:
+            resolution = VideoResolution.BEST
+
+    # Advanced options in expander
+    with st.expander("Advanced Options"):
+        col3, col4 = st.columns(2)
+        with col3:
+            cookies_file = st.file_uploader(
+                "Cookies file (optional)",
+                type=["txt"],
+                key="cookies_upload",
+                help="Upload cookies.txt for authenticated downloads",
+            )
+            max_retries = st.number_input(
+                "Max retries", min_value=1, max_value=10, value=3, key="max_retries"
+            )
+        with col4:
+            embed_thumbnail = st.checkbox(
+                "Embed thumbnail", value=True, key="embed_thumbnail"
+            )
+            embed_metadata = st.checkbox(
+                "Embed metadata", value=True, key="embed_metadata"
+            )
 
     cookies_path = None
     if cookies_file:
@@ -118,14 +149,18 @@ def render_download_tab():
     is_playlist = download_type == "Playlist"
 
     if st.button("Download", type="primary", disabled=not url, key="download_btn"):
-        options = DownloadOptions(
+        config = DownloadConfig(
             output_dir=output_dir,
             output_format=output_format,
+            resolution=resolution,
             cookies_file=cookies_path,
+            retries=max_retries,
+            embed_thumbnail=embed_thumbnail,
+            write_info_json=embed_metadata,
         )
 
         with st.spinner("Downloading..."):
-            success, message = _perform_download(url, is_playlist, options)
+            success, message = _perform_download(url, is_playlist, config)
 
         if success:
             st.success(message)
