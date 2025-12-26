@@ -4,6 +4,7 @@ import click
 
 from .audio_cmd import audio_info, effects, normalize_audio, trim_audio
 from .download_cmd import info, playlist, video
+from .project_cmd import project_info, project_list, project_new
 from .video_cmd import concat, overlay, trim, video_info
 
 
@@ -30,6 +31,11 @@ cli.add_command(trim_audio)
 cli.add_command(effects)
 cli.add_command(audio_info)
 cli.add_command(normalize_audio)
+
+# Project management commands
+cli.add_command(project_new)
+cli.add_command(project_info)
+cli.add_command(project_list)
 
 
 if __name__ == "__main__":
