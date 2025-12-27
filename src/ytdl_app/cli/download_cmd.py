@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from ytdl_app.download import Downloader, DownloadOptions
+from ytdl_app.download import DownloadConfig, Downloader
 from ytdl_app.models import OutputFormat
 
 
@@ -48,14 +48,14 @@ def _create_progress_callback() -> callable:
 )
 def video(url: str, output_dir: Path, output_format: str, cookies: Path | None):
     """Download a single video from URL."""
-    options = DownloadOptions(
+    config = DownloadConfig(
         output_dir=output_dir,
         output_format=OutputFormat(output_format.lower()),
         cookies_file=cookies,
     )
 
     downloader = Downloader(
-        options=options, progress_callback=_create_progress_callback()
+        config=config, progress_callback=_create_progress_callback()
     )
     click.echo(f"Downloading video as {output_format.upper()}...")
 
@@ -92,14 +92,14 @@ def video(url: str, output_dir: Path, output_format: str, cookies: Path | None):
 )
 def playlist(url: str, output_dir: Path, output_format: str, cookies: Path | None):
     """Download an entire playlist from URL."""
-    options = DownloadOptions(
+    config = DownloadConfig(
         output_dir=output_dir,
         output_format=OutputFormat(output_format.lower()),
         cookies_file=cookies,
     )
 
     downloader = Downloader(
-        options=options, progress_callback=_create_progress_callback()
+        config=config, progress_callback=_create_progress_callback()
     )
     click.echo(f"Downloading playlist as {output_format.upper()}...")
 
