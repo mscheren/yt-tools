@@ -119,13 +119,13 @@ ytdl project-list ./projects
 Launch the Streamlit web interface:
 
 ```bash
-cd src && streamlit run ytdl_app/gui/app.py
+ytdl gui
 ```
 
-Or with poetry:
+Optionally specify a port:
 
 ```bash
-poetry run sh -c "cd src && streamlit run ytdl_app/gui/app.py"
+ytdl gui --port 8080
 ```
 
 The GUI provides four main tabs:
