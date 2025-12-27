@@ -133,7 +133,7 @@ def _render_normalize_section(source_dir: Path):
         )
 
         output_name = st.text_input(
-            "Output filename", value="normalized_audio.wav", key="normalize_output"
+            "Output filename", value="normalized_audio.wav", key="normalize_file_output"
         )
 
         if st.button("Normalize Audio", key="normalize_btn"):
