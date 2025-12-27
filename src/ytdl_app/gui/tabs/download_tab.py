@@ -9,12 +9,75 @@ from ytdl_app.gui.components import render_directory_selector
 from ytdl_app.models import OutputFormat, VideoResolution
 
 
+class DownloadProgressUI:
+    """Manages download progress display in Streamlit."""
+
+    def __init__(self):
+        self.status_container = st.empty()
+        self.progress_bar = st.progress(0.0)
+        self.details_container = st.empty()
+        self._current_title = ""
+
+    def create_callback(self):
+        """Create a yt-dlp progress callback that updates the UI."""
+
+        def callback(d: dict) -> None:
+            status = d.get("status", "")
+
+            if status == "downloading":
+                # Extract progress info
+                percent_str = d.get("_percent_str", "0%").strip()
+                speed_str = d.get("_speed_str", "N/A")
+                eta_str = d.get("_eta_str", "N/A")
+                filename = d.get("filename", "")
+
+                # Parse percentage for progress bar
+                try:
+                    percent = float(percent_str.replace("%", "")) / 100.0
+                    self.progress_bar.progress(min(percent, 1.0))
+                except (ValueError, TypeError):
+                    pass
+
+                # Update status text
+                title = d.get("info_dict", {}).get("title", Path(filename).stem)
+                if title != self._current_title:
+                    self._current_title = title
+                    self.status_container.info(f"Downloading: **{title}**")
+
+                # Show details
+                self.details_container.text(
+                    f"Progress: {percent_str} | Speed: {speed_str} | ETA: {eta_str}"
+                )
+
+            elif status == "finished":
+                self.progress_bar.progress(1.0)
+                self.details_container.text("Processing and converting...")
+
+            elif status == "error":
+                self.details_container.error("Download error occurred")
+
+        return callback
+
+    def complete(self, message: str):
+        """Mark download as complete."""
+        self.progress_bar.progress(1.0)
+        self.status_container.success(message)
+        self.details_container.empty()
+
+    def error(self, message: str):
+        """Mark download as failed."""
+        self.status_container.error(message)
+        self.details_container.empty()
+
+
 def _perform_download(
-    url: str, is_playlist: bool, config: DownloadConfig
+    url: str, is_playlist: bool, config: DownloadConfig, progress_ui: DownloadProgressUI
 ) -> tuple[bool, str]:
     """Execute download and return (success, message)."""
     try:
-        downloader = Downloader(config=config)
+        downloader = Downloader(
+            config=config, progress_callback=progress_ui.create_callback()
+        )
 
         if is_playlist:
             info = downloader.download_playlist(url)
@@ -159,13 +222,14 @@ def render_download_tab():
             write_info_json=embed_metadata,
         )
 
-        with st.spinner("Downloading..."):
-            success, message = _perform_download(url, is_playlist, config)
+        # Create progress UI
+        progress_ui = DownloadProgressUI()
+        success, message = _perform_download(url, is_playlist, config, progress_ui)
 
         if success:
-            st.success(message)
+            progress_ui.complete(message)
         else:
-            st.error(message)
+            progress_ui.error(message)
 
     st.divider()
     _render_info_section()
