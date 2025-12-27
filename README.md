@@ -5,12 +5,14 @@ A Python application for downloading YouTube content and editing video/audio fil
 ## Features
 
 ### Download
+
 - Download YouTube videos and playlists (MP4/MP3)
 - Resolution selection (1080p, 720p, 480p, etc.)
 - Download queue with pause/resume
 - Archive tracking to avoid re-downloads
 
 ### Video Editing
+
 - Trim, concatenate, speed adjustment, reverse, loop
 - Crop, resize, rotate
 - Color grading (brightness, contrast, saturation, gamma)
@@ -18,6 +20,7 @@ A Python application for downloading YouTube content and editing video/audio fil
 - Text overlays and subtitles
 
 ### Audio Processing
+
 - Effects: EQ, compression, reverb, gain, limiting
 - Presets: podcast, radio, reverb_light, reverb_heavy, warm
 - Mixing: overlay, ducking, crossfade, fades
@@ -25,6 +28,7 @@ A Python application for downloading YouTube content and editing video/audio fil
 - Extract audio from video
 
 ### Project Management
+
 - Save/load projects (JSON/YAML)
 - Batch processing
 - Undo/redo history
