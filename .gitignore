@@ -45,6 +45,7 @@ output/
 *.webm
 *.mkv
 downloaded/
+projects/
 
 # OS
 .DS_Store
