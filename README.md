@@ -1,6 +1,6 @@
-# Media Tools
+# YT Media Tools
 
-A Python application for downloading YouTube content and editing video/audio files. Provides both a command-line interface and a Streamlit web GUI.
+A Python application for processing YouTube content and editing video/audio files. Provides both a command-line interface and a Streamlit web GUI.
 
 ## Features
 

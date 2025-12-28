@@ -14,14 +14,14 @@ from ytdl_app.gui.tabs import (
 def main():
     """Main entry point for the Streamlit app."""
     st.set_page_config(
-        page_title="Media Tools",
+        page_title="YT Media Tools",
         page_icon="▶",
         layout="wide",
     )
 
     init_session_state()
 
-    st.title("Media Tools")
+    st.title("YT Media Tools")
     st.caption("Download, edit video, and process audio")
 
     tab_download, tab_video, tab_audio, tab_project = st.tabs(
