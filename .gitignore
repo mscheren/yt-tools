@@ -37,7 +37,6 @@ poetry.lock
 *~
 
 # Project specific
-cookies.txt
 output/
 *.mp4
 *.mp3
@@ -46,6 +45,7 @@ output/
 *.mkv
 downloaded/
 projects/
+cookies/
 
 # OS
 .DS_Store
