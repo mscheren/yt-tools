@@ -41,6 +41,9 @@ class DownloadConfig:
     # Rate limiting
     rate_limit: str | None = None  # e.g., "1M" for 1MB/s
 
+    # Playlist selection
+    playlist_items: str | None = None  # e.g., "1,3,5-7" for specific items
+
     def get_output_template(self, is_playlist: bool = False) -> str:
         """Generate the output template string for yt-dlp."""
         if self.output_template:
@@ -87,6 +90,9 @@ class DownloadConfig:
 
         if self.rate_limit:
             opts["ratelimit"] = self.rate_limit
+
+        if self.playlist_items:
+            opts["playlist_items"] = self.playlist_items
 
         if self.write_thumbnail:
             opts["writethumbnail"] = True
