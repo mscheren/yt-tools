@@ -82,13 +82,84 @@ def _perform_download(
         if is_playlist:
             info = downloader.download_playlist(url)
             title = info.get("title", "Unknown Playlist")
-            count = len(info.get("entries", []))
+            entries = info.get("entries", [])
+            # Count actual downloads (some may be None if filtered)
+            count = sum(1 for e in entries if e is not None)
             return True, f"Downloaded playlist: {title} ({count} items)"
         else:
             info = downloader.download(url)
             return True, f"Downloaded: {info.get('title', 'Unknown')}"
     except Exception as e:
         return False, f"Download failed: {e}"
+
+
+def _fetch_playlist_info(url: str) -> dict | None:
+    """Fetch playlist metadata without downloading."""
+    try:
+        downloader = Downloader()
+        return downloader.get_info(url)
+    except Exception:
+        return None
+
+
+def _render_playlist_selector():
+    """Render playlist video selection UI."""
+    playlist_info = st.session_state.get("playlist_info")
+
+    if not playlist_info:
+        return None
+
+    entries = playlist_info.get("entries", [])
+    if not entries:
+        st.warning("No videos found in playlist")
+        return None
+
+    st.subheader(f"Playlist: {playlist_info.get('title', 'Unknown')}")
+    st.write(f"**{len(entries)} videos available**")
+
+    # Select all / Deselect all buttons
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col1:
+        if st.button("Select All", key="select_all_btn"):
+            for i in range(len(entries)):
+                st.session_state[f"playlist_item_{i}"] = True
+            st.rerun()
+    with col2:
+        if st.button("Deselect All", key="deselect_all_btn"):
+            for i in range(len(entries)):
+                st.session_state[f"playlist_item_{i}"] = False
+            st.rerun()
+
+    # Initialize selection state if not present
+    for i in range(len(entries)):
+        if f"playlist_item_{i}" not in st.session_state:
+            st.session_state[f"playlist_item_{i}"] = True
+
+    # Display videos with checkboxes
+    selected_indices = []
+    with st.container(height=300):
+        for i, entry in enumerate(entries):
+            if entry is None:
+                continue
+
+            title = entry.get("title", f"Video {i + 1}")
+            duration = entry.get("duration", 0)
+            duration_str = ""
+            if duration:
+                mins, secs = divmod(int(duration), 60)
+                duration_str = f" ({mins}:{secs:02d})"
+
+            is_selected = st.checkbox(
+                f"{i + 1}. {title}{duration_str}",
+                key=f"playlist_item_{i}",
+            )
+            if is_selected:
+                selected_indices.append(i + 1)  # 1-indexed for yt-dlp
+
+    # Show selection count
+    st.write(f"**Selected: {len(selected_indices)} / {len(entries)} videos**")
+
+    return selected_indices
 
 
 def _render_info_section():
@@ -211,7 +282,53 @@ def render_download_tab():
     )
     is_playlist = download_type == "Playlist"
 
-    if st.button("Download", type="primary", disabled=not url, key="download_btn"):
+    # Playlist selection workflow
+    selected_items = None
+    if is_playlist and url:
+        # Check if URL changed - clear old playlist info
+        if st.session_state.get("playlist_url") != url:
+            st.session_state["playlist_info"] = None
+            st.session_state["playlist_url"] = url
+            # Clear old selection states
+            for key in list(st.session_state.keys()):
+                if key.startswith("playlist_item_"):
+                    del st.session_state[key]
+
+        col_fetch, col_clear = st.columns([1, 1])
+        with col_fetch:
+            if st.button("Fetch Playlist", key="fetch_playlist_btn"):
+                with st.spinner("Fetching playlist info..."):
+                    info = _fetch_playlist_info(url)
+                    if info and "entries" in info:
+                        st.session_state["playlist_info"] = info
+                        st.rerun()
+                    else:
+                        st.error("Failed to fetch playlist or URL is not a playlist")
+
+        with col_clear:
+            if st.session_state.get("playlist_info"):
+                if st.button("Clear Selection", key="clear_playlist_btn"):
+                    st.session_state["playlist_info"] = None
+                    st.rerun()
+
+        # Render playlist selector if we have playlist info
+        selected_items = _render_playlist_selector()
+
+    # Build playlist_items string if we have selections
+    playlist_items_str = None
+    if selected_items:
+        playlist_items_str = ",".join(str(i) for i in selected_items)
+
+    # Determine if download is possible
+    can_download = bool(url)
+    if is_playlist and st.session_state.get("playlist_info"):
+        can_download = bool(selected_items)
+
+    download_label = "Download"
+    if is_playlist and selected_items:
+        download_label = f"Download {len(selected_items)} Videos"
+
+    if st.button(download_label, type="primary", disabled=not can_download, key="download_btn"):
         config = DownloadConfig(
             output_dir=output_dir,
             output_format=output_format,
@@ -220,6 +337,7 @@ def render_download_tab():
             retries=max_retries,
             embed_thumbnail=embed_thumbnail,
             write_info_json=embed_metadata,
+            playlist_items=playlist_items_str,
         )
 
         # Create progress UI
